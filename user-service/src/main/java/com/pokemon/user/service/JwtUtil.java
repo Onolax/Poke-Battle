@@ -33,6 +33,13 @@ public class JwtUtil {
                 .compact();
     }
 
+    /**
+     * Parses and validates a JWT token.
+     *
+     * @param token the compact JWT string
+     * @return parsed claims
+     * @throws io.jsonwebtoken.JwtException if the token is invalid, expired, or tampered
+     */
     public Claims validate(String token) {
         return Jwts.parser()
                 .verifyWith(key)
