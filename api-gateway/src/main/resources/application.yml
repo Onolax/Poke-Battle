@@ -7,20 +7,35 @@ spring:
     gateway:
       routes:
         - id: auth-route
-          uri: http://localhost:8081
+          uri: ${USER_SERVICE_URL:http://localhost:8081}
           predicates:
             - Path=/auth/**
-
         - id: user-api-route
-          uri: http://localhost:8081
+          uri: ${USER_SERVICE_URL:http://localhost:8081}
           predicates:
             - Path=/api/users/**,/api/teams/**
-
         - id: game-data-route
-          uri: http://localhost:8082
+          uri: ${GAME_DATA_SERVICE_URL:http://localhost:8082}
           predicates:
             - Path=/api/pokemon/**,/api/validate/**
-
+        - id: lobby-route
+          uri: ${LOBBY_SERVICE_URL:http://localhost:8083}
+          predicates:
+            - Path=/api/lobby/**
+        - id: battle-http-route
+          uri: ${BATTLE_SERVICE_URL:http://localhost:8084}
+          predicates:
+            - Path=/api/battle/**
+        - id: battle-ws-route
+          uri: ${BATTLE_SERVICE_URL:http://localhost:8084}
+          predicates:
+            - Path=/ws/battle/**
+          metadata:
+            response-timeout: 0ms
+        - id: rating-route
+          uri: ${RATING_SERVICE_URL:http://localhost:8085}
+          predicates:
+            - Path=/api/ratings/**
 app:
   jwt:
     secret: "${JWT_SECRET:changeme-32-char-secret-for-dev-only}"

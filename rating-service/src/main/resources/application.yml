@@ -3,3 +3,14 @@ server:
 spring:
   application:
     name: rating-service
+  datasource:
+    url: "${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/pokemon}"
+    username: "${SPRING_DATASOURCE_USERNAME:pokemon}"
+    password: "${SPRING_DATASOURCE_PASSWORD:pokemon}"
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+  flyway:
+    enabled: false

@@ -4,9 +4,9 @@ spring:
   application:
     name: user-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/pokemon
-    username: pokemon
-    password: pokemon
+    url: "${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/pokemon}"
+    username: "${SPRING_DATASOURCE_USERNAME:pokemon}"
+    password: "${SPRING_DATASOURCE_PASSWORD:pokemon}"
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -22,4 +22,4 @@ app:
     secret: "${JWT_SECRET:changeme-32-char-secret-for-dev-only}"
     expiration-hours: 24
   game-data:
-    url: http://localhost:8082
+    url: "${GAME_DATA_SERVICE_URL:http://localhost:8082}"

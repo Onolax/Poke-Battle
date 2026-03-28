@@ -1,9 +1,6 @@
-version: '3.9'
-
 services:
   postgres:
     image: postgres:16
-    container_name: pokemon-postgres
     environment:
       POSTGRES_DB: pokemon
       POSTGRES_USER: pokemon
@@ -11,39 +8,130 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U pokemon"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 5
 
-  mongo:
+  mongodb:
     image: mongo:7.0
-    container_name: pokemon-mongo
-    environment:
-      MONGO_INITDB_DATABASE: pokemon
     ports:
       - "27017:27017"
     volumes:
-      - mongo_data:/data/db
+      - mongo-data:/data/db
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')", "--quiet"]
-      interval: 5s
+      test: ["CMD", "mongosh", "--eval", "db.runCommand('ping').ok"]
+      interval: 10s
       timeout: 5s
       retries: 5
 
   redis:
-    image: redis:7.2
-    container_name: pokemon-redis
+    image: redis:7.2-alpine
     ports:
       - "6379:6379"
+    volumes:
+      - redis-data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 5
 
+  game-data-service:
+    build:
+      context: ..
+      dockerfile: game-data-service/Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/pokemon
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    restart: unless-stopped
+
+  user-service:
+    build:
+      context: ..
+      dockerfile: user-service/Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/pokemon
+      SPRING_DATASOURCE_USERNAME: pokemon
+      SPRING_DATASOURCE_PASSWORD: pokemon
+      GAME_DATA_SERVICE_URL: http://game-data-service:8082
+      JWT_SECRET: changeme-32-char-secret-for-dev-only
+    depends_on:
+      postgres:
+        condition: service_healthy
+      game-data-service:
+        condition: service_started
+    restart: unless-stopped
+
+  api-gateway:
+    build:
+      context: ..
+      dockerfile: api-gateway/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      USER_SERVICE_URL: http://user-service:8081
+      GAME_DATA_SERVICE_URL: http://game-data-service:8082
+      LOBBY_SERVICE_URL: http://lobby-service:8083
+      BATTLE_SERVICE_URL: http://battle-service:8084
+      RATING_SERVICE_URL: http://rating-service:8085
+      JWT_SECRET: changeme-32-char-secret-for-dev-only
+    depends_on:
+      - user-service
+    restart: unless-stopped
+
+  lobby-service:
+    build:
+      context: ..
+      dockerfile: lobby-service/Dockerfile
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  battle-service:
+    build:
+      context: ..
+      dockerfile: battle-service/Dockerfile
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  rating-service:
+    build:
+      context: ..
+      dockerfile: rating-service/Dockerfile
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/pokemon
+      SPRING_DATASOURCE_USERNAME: pokemon
+      SPRING_DATASOURCE_PASSWORD: pokemon
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
-  postgres_data:
-  mongo_data:
+  postgres-data:
+  mongo-data:
+  redis-data:
