@@ -17,4 +17,26 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleBadCredentials(BadCredentialsException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
+
+    @ExceptionHandler(TeamValidationException.class)
+    public ProblemDetail handleTeamValidation(TeamValidationException ex) {
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, "Team validation failed");
+        pd.setProperty("errors", ex.getErrors());
+        return pd;
+    }
+
+    @ExceptionHandler(TeamNotFoundException.class)
+    public ProblemDetail handleTeamNotFound(TeamNotFoundException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ProblemDetail handleUserNotFound(UserNotFoundException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(com.pokemon.user.client.GameDataUnavailableException.class)
+    public ProblemDetail handleGameDataUnavailable(com.pokemon.user.client.GameDataUnavailableException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, "Game data service unavailable");
+    }
 }
