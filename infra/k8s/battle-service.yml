@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: battle-service
-          image: battle-service:latest
+          image: battle-service:v2
           imagePullPolicy: Never
           ports:
             - containerPort: 8084

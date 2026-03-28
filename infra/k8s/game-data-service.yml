@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: game-data-service
-          image: game-data-service:latest
+          image: game-data-service:v2
           imagePullPolicy: Never
           ports:
             - containerPort: 8082

@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: lobby-service
-          image: lobby-service:latest
+          image: lobby-service:v2
           imagePullPolicy: Never
           ports:
             - containerPort: 8083
