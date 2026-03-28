@@ -3,3 +3,24 @@ server:
 spring:
   application:
     name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: auth-route
+          uri: http://localhost:8081
+          predicates:
+            - Path=/auth/**
+
+        - id: user-api-route
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/users/**,/api/teams/**
+
+        - id: game-data-route
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/pokemon/**,/api/validate/**
+
+app:
+  jwt:
+    secret: "${JWT_SECRET:changeme-32-char-secret-for-dev-only}"
