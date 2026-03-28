@@ -3,3 +3,23 @@ server:
 spring:
   application:
     name: user-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pokemon
+    username: pokemon
+    password: pokemon
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    locations: classpath:db/migration
+app:
+  jwt:
+    secret: "changeme-32-char-secret-for-hmac256"
+    expiration-hours: 24
+  game-data:
+    url: http://localhost:8082
