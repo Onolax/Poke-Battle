@@ -1,0 +1,1 @@
+# Testcontainers overrides spring.data.mongodb.uri via @DynamicPropertySource
