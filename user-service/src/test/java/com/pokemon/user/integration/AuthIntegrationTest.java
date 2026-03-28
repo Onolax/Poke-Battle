@@ -9,6 +9,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
@@ -40,6 +41,9 @@ class AuthIntegrationTest {
         r.add("spring.datasource.password", postgres::getPassword);
     }
 
+    @Value("${app.jwt.secret}")
+    String jwtSecret;
+
     @Autowired
     TestRestTemplate http;
 
@@ -67,7 +71,7 @@ class AuthIntegrationTest {
 
         // Parse token and verify claims
         SecretKey key = Keys.hmacShaKeyFor(
-                "changeme-32-char-secret-for-dev-only".getBytes(StandardCharsets.UTF_8));
+                jwtSecret.getBytes(StandardCharsets.UTF_8));
         Claims claims = Jwts.parser().verifyWith(key).build()
                 .parseSignedClaims(token).getPayload();
         assertThat(claims.getSubject()).isEqualTo(regResp.getBody().userId().toString());
