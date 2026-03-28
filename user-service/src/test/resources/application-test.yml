@@ -1,0 +1,3 @@
+app:
+  game-data:
+    url: http://localhost:9999  # non-existent — auth tests don't call game-data
