@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: poke-battle-config
+  namespace: poke-battle
+data:
+  SPRING_DATA_MONGODB_URI: "mongodb://mongodb:27017/pokemon"
+  SPRING_DATA_REDIS_HOST: "redis"
+  SPRING_DATA_REDIS_PORT: "6379"
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/pokemon"
+  SPRING_DATASOURCE_USERNAME: "pokemon"
+  GAME_DATA_SERVICE_URL: "http://game-data-service:8082"
+  USER_SERVICE_URL: "http://user-service:8081"
+  LOBBY_SERVICE_URL: "http://lobby-service:8083"
+  BATTLE_SERVICE_URL: "http://battle-service:8084"
+  RATING_SERVICE_URL: "http://rating-service:8085"

@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: game-data-service
+  namespace: poke-battle
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: game-data-service
+  template:
+    metadata:
+      labels:
+        app: game-data-service
+    spec:
+      containers:
+        - name: game-data-service
+          image: game-data-service:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8082
+          envFrom:
+            - configMapRef:
+                name: poke-battle-config
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          readinessProbe:
+            tcpSocket:
+              port: 8082
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 8082
+            initialDelaySeconds: 60
+            periodSeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: game-data-service
+  namespace: poke-battle
+spec:
+  selector:
+    app: game-data-service
+  ports:
+    - port: 8082
+      targetPort: 8082
