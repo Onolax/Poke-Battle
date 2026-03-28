@@ -19,6 +19,9 @@ import java.util.Date;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.mockito.ArgumentCaptor;
+import org.springframework.web.server.ServerWebExchange;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -57,16 +60,22 @@ class JwtAuthenticationFilterTest {
 
     @Test
     void validToken_injectsHeadersAndForwards() {
-        String token = buildToken(UUID.randomUUID(), "ash", 1);
+        UUID userId = UUID.randomUUID();
+        String token = buildToken(userId, "ash", 1);
         var exchange = MockServerWebExchange.from(
                 MockServerHttpRequest.get("/api/teams")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .build());
 
+        ArgumentCaptor<ServerWebExchange> captor = ArgumentCaptor.forClass(ServerWebExchange.class);
+        when(chain.filter(captor.capture())).thenReturn(Mono.empty());
+
         StepVerifier.create(filter.filter(exchange, chain))
                 .verifyComplete();
 
-        verify(chain).filter(any());
+        ServerWebExchange captured = captor.getValue();
+        assertThat(captured.getRequest().getHeaders().getFirst("X-User-Id")).isEqualTo(userId.toString());
+        assertThat(captured.getRequest().getHeaders().getFirst("X-Username")).isEqualTo("ash");
         assertThat(exchange.getResponse().getStatusCode()).isNull();
     }
 
