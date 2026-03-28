@@ -19,11 +19,17 @@ public class GameDataClient {
 
     public TeamValidationResult validateTeam(List<String> slugs, String formatId) {
         try {
-            return restClient.post()
+            TeamValidationResult result = restClient.post()
                     .uri("/api/validate/team")
                     .body(new TeamValidationRequest(slugs, formatId))
                     .retrieve()
                     .body(TeamValidationResult.class);
+            if (result == null) {
+                throw new GameDataUnavailableException("game-data-service returned empty body", null);
+            }
+            return result;
+        } catch (GameDataUnavailableException e) {
+            throw e;
         } catch (RestClientException e) {
             throw new GameDataUnavailableException("game-data-service unavailable", e);
         }
