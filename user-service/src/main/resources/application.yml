@@ -19,7 +19,7 @@ spring:
     locations: classpath:db/migration
 app:
   jwt:
-    secret: "changeme-32-char-secret-for-hmac256"
+    secret: "${JWT_SECRET:changeme-32-char-secret-for-dev-only}"
     expiration-hours: 24
   game-data:
     url: http://localhost:8082
