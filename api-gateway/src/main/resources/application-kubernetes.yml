@@ -1,41 +1,34 @@
-server:
-  port: 8080
 spring:
-  application:
-    name: api-gateway
   cloud:
     gateway:
       routes:
         - id: auth-route
-          uri: ${USER_SERVICE_URL:http://user-service:8081}
+          uri: http://user-service:8081
           predicates:
             - Path=/auth/**
         - id: user-api-route
-          uri: ${USER_SERVICE_URL:http://user-service:8081}
+          uri: http://user-service:8081
           predicates:
             - Path=/api/users/**,/api/teams/**
         - id: game-data-route
-          uri: ${GAME_DATA_SERVICE_URL:http://game-data-service:8082}
+          uri: http://game-data-service:8082
           predicates:
             - Path=/api/pokemon/**,/api/validate/**
         - id: lobby-route
-          uri: ${LOBBY_SERVICE_URL:http://lobby-service:8083}
+          uri: http://lobby-service:8083
           predicates:
             - Path=/api/lobby/**
         - id: battle-http-route
-          uri: ${BATTLE_SERVICE_URL:http://battle-service:8084}
+          uri: http://battle-service:8084
           predicates:
             - Path=/api/battle/**
         - id: battle-ws-route
-          uri: ${BATTLE_SERVICE_URL:http://battle-service:8084}
+          uri: http://battle-service:8084
           predicates:
             - Path=/ws/battle/**
           metadata:
             response-timeout: 0ms
         - id: rating-route
-          uri: ${RATING_SERVICE_URL:http://rating-service:8085}
+          uri: http://rating-service:8085
           predicates:
             - Path=/api/ratings/**
-app:
-  jwt:
-    secret: "${JWT_SECRET:changeme-32-char-secret-for-dev-only}"
