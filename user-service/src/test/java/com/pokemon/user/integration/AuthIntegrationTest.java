@@ -82,7 +82,7 @@ class AuthIntegrationTest {
     void loginWithBadPassword_returns401() {
         // Register first
         http.postForEntity("/auth/register",
-                new RegisterRequest("brock", "brock@pewter.com", "onix"), RegisterResponse.class);
+                new RegisterRequest("brock", "brock@pewter.com", "onix123"), RegisterResponse.class);
 
         // Wrong password
         ResponseEntity<Void> resp = http.postForEntity(

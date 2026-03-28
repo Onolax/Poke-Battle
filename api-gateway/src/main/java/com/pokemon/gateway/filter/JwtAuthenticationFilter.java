@@ -57,6 +57,7 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
             ServerHttpRequest mutated = exchange.getRequest().mutate()
                     .headers(h -> h.remove("X-User-Id"))
                     .headers(h -> h.remove("X-Username"))
+                    .headers(h -> h.remove(HttpHeaders.AUTHORIZATION))
                     .header("X-User-Id", userId)
                     .header("X-Username", username)
                     .build();

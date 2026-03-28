@@ -4,6 +4,7 @@ import com.pokemon.user.dto.CreateTeamRequest;
 import com.pokemon.user.dto.CreateTeamResponse;
 import com.pokemon.user.dto.TeamResponse;
 import com.pokemon.user.service.TeamService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +25,7 @@ public class TeamController {
     @ResponseStatus(HttpStatus.CREATED)
     public CreateTeamResponse createTeam(
             @RequestHeader("X-User-Id") UUID userId,
-            @RequestBody CreateTeamRequest req) {
+            @Valid @RequestBody CreateTeamRequest req) {
         return teamService.createTeam(userId, req);
     }
 
