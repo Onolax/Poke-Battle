@@ -2,8 +2,10 @@ package com.pokemon.lobby;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
+@EnableScheduling
 public class LobbyServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(LobbyServiceApplication.class, args);
