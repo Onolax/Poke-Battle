@@ -25,6 +25,13 @@ public class PokemonController {
         return pokemonService.findAll();
     }
 
+    @GetMapping("/name/{name}")
+    public ResponseEntity<Pokemon> getByName(@PathVariable String name) {
+        return pokemonService.findByName(name)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Pokemon> getById(@PathVariable String id) {
         return pokemonService.findById(id)

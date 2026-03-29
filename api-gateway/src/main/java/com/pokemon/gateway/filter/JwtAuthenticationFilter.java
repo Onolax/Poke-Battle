@@ -39,11 +39,16 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         }
 
         String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        String token;
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+        } else if (path.startsWith("/ws/")) {
+            // WebSocket/SockJS: browser cannot send Authorization header, token arrives as query param
+            token = exchange.getRequest().getQueryParams().getFirst("token");
+            if (token == null) return unauthorized(exchange);
+        } else {
             return unauthorized(exchange);
         }
-
-        String token = authHeader.substring(7);
         try {
             Claims claims = Jwts.parser()
                     .verifyWith(key)

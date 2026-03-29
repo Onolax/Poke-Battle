@@ -5,6 +5,7 @@ import java.util.Map;
 
 public class SeedData {
 
+
     public static final List<String> POKEMON_SLUGS = List.of(
             "garchomp", "great-tusk", "iron-hands", "gholdengo", "kingambit",
             "dragapult", "roaring-moon", "iron-valiant", "volcarona", "garganacl",

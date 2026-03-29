@@ -7,6 +7,7 @@ import java.util.Map;
 public class BattlePokemon {
     public String slug;
     public String name;
+    public int dexNumber;
     public List<String> types;
     public int maxHp;
     public int currentHp;

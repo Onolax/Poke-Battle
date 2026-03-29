@@ -21,6 +21,8 @@ public class LobbyService {
     }
 
     public void enqueue(String userId, String teamId, String format) {
+        // Clear any stale battle reference so getStatus() won't redirect to an old match
+        redisTemplate.delete(USER_BATTLE_KEY_PREFIX + userId + BATTLE_KEY_SUFFIX);
         String queueKey = QUEUE_KEY_PREFIX + format;
         String member = userId + ":" + teamId;
         double score = System.currentTimeMillis();

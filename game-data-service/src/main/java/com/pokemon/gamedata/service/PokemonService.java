@@ -24,6 +24,10 @@ public class PokemonService {
         return pokemonRepository.findById(id);
     }
 
+    public Optional<Pokemon> findByName(String name) {
+        return pokemonRepository.findByNameIgnoreCase(name);
+    }
+
     public List<Pokemon> findByGen9ouTier(String tier) {
         return pokemonRepository.findByTierGen9ou(tier);
     }

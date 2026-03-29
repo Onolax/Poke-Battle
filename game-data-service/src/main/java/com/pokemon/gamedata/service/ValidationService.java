@@ -20,7 +20,7 @@ public class ValidationService {
     }
 
     public ValidationResult validateTeam(List<String> slugs, String formatId) {
-        Format format = formatRepository.findById(formatId)
+        Format format = formatRepository.findById(formatId.toLowerCase())
                 .orElseThrow(() -> new IllegalArgumentException("Unknown format: " + formatId));
 
         List<String> errors = new ArrayList<>();

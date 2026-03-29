@@ -21,15 +21,18 @@ public class MatchFoundConsumer {
 
     private final BattleStateRepository repo;
     private final BattleEventProducer producer;
-    private final RestClient restClient;
+    private final RestClient userClient;
+    private final RestClient gameDataClient;
     private final ObjectMapper objectMapper;
 
     public MatchFoundConsumer(BattleStateRepository repo, BattleEventProducer producer,
                                RestClient.Builder restClientBuilder, ObjectMapper objectMapper,
-                               @Value("${USER_SERVICE_URL:http://user-service:8081}") String userServiceUrl) {
+                               @Value("${USER_SERVICE_URL:http://user-service:8081}") String userServiceUrl,
+                               @Value("${GAME_DATA_SERVICE_URL:http://game-data-service:8082}") String gameDataServiceUrl) {
         this.repo = repo;
         this.producer = producer;
-        this.restClient = restClientBuilder.baseUrl(userServiceUrl).build();
+        this.userClient = restClientBuilder.baseUrl(userServiceUrl).build();
+        this.gameDataClient = restClientBuilder.baseUrl(gameDataServiceUrl).build();
         this.objectMapper = objectMapper;
     }
 
@@ -38,8 +41,8 @@ public class MatchFoundConsumer {
         log.info("Match found: {} vs {} → battle {}", event.player1Id(), event.player2Id(), event.battleId());
 
         // Fetch teams from user-service (internal bypass — no JWT needed)
-        BattlePokemon[] team1 = fetchTeam(event.player1TeamId());
-        BattlePokemon[] team2 = fetchTeam(event.player2TeamId());
+        BattlePokemon[] team1 = fetchTeam(event.player1TeamId(), event.player1Id());
+        BattlePokemon[] team2 = fetchTeam(event.player2TeamId(), event.player2Id());
 
         if (team1 == null || team2 == null) {
             log.error("Failed to fetch teams for battle {}", event.battleId());
@@ -64,11 +67,11 @@ public class MatchFoundConsumer {
         log.info("Battle {} initialised", event.battleId());
     }
 
-    private BattlePokemon[] fetchTeam(String teamId) {
+    private BattlePokemon[] fetchTeam(String teamId, String userId) {
         try {
-            String json = restClient.get()
+            String json = userClient.get()
                     .uri("/api/teams/" + teamId)
-                    .header("X-Internal-Call", "true")
+                    .header("X-User-Id", userId)
                     .retrieve()
                     .body(String.class);
 
@@ -89,12 +92,32 @@ public class MatchFoundConsumer {
     }
 
     private BattlePokemon buildBattlePokemon(String slug) {
-        // In a full implementation we'd call game-data-service for move/stat data.
-        // Here we build a basic battle pokemon with default stats and moves.
         BattlePokemon bp = new BattlePokemon();
         bp.slug = slug;
         bp.name = toDisplayName(slug);
-        bp.types = List.of("Normal"); // game-data-service would provide real types
+        bp.types = List.of("Normal");
+        bp.dexNumber = 0;
+
+        // Resolve dexNumber and real types from game-data-service
+        try {
+            String json = gameDataClient.get()
+                    .uri("/api/pokemon/name/" + slug)
+                    .retrieve()
+                    .body(String.class);
+            if (json != null) {
+                JsonNode node = objectMapper.readTree(json);
+                bp.dexNumber = node.path("dexNumber").asInt(0);
+                JsonNode typesNode = node.path("types");
+                if (typesNode.isArray() && !typesNode.isEmpty()) {
+                    List<String> types = new ArrayList<>();
+                    typesNode.forEach(t -> types.add(t.asText()));
+                    bp.types = types;
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Could not resolve dexNumber for slug '{}': {}", slug, e.getMessage());
+        }
+
         bp.maxHp = 200;
         bp.currentHp = 200;
         bp.attack = 80;
