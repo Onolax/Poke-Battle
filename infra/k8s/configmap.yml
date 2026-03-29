@@ -14,3 +14,4 @@ data:
   LOBBY_SERVICE_URL: "http://lobby-service:8083"
   BATTLE_SERVICE_URL: "http://battle-service:8084"
   RATING_SERVICE_URL: "http://rating-service:8085"
+  SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
