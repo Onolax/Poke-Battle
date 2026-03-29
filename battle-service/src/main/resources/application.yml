@@ -3,6 +3,9 @@ server:
 spring:
   application:
     name: battle-service
+app:
+  jwt:
+    secret: "${JWT_SECRET:changeme-32-char-secret-for-dev-only}"
   data:
     redis:
       host: "${SPRING_DATA_REDIS_HOST:localhost}"
