@@ -99,9 +99,3 @@ docker exec infra-mongodb-1 mongosh pokemon --quiet --eval "db.pokemon.countDocu
 - WebSocket connections pass the JWT as a `?token=` query parameter (browser limitation); the gateway accepts this for `/ws/**` paths
 - Battle state is stored in Redis hashes (fast read/write per turn); Kafka events drive post-battle rating updates
 - Flyway manages schema migrations for PostgreSQL; each service using Flyway has its own `flyway_schema_history_*` table to avoid collision on the shared database
-
-## Running Tests
-
-```bash
-mvn test
-```
